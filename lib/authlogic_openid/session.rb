@@ -94,6 +94,8 @@ module AuthlogicOpenid
           self.remember_me = controller.params[:remember_me] == "true" if controller.params.key?(:remember_me)
           
           options = {
+           'oauth[scope]' => klass.oauth_scope, 
+           'oauth[consumer]' => klass.oauth_consumer_key, 
            :required => klass.openid_required_fields,
            :optional => klass.openid_optional_fields,
            :return_to => controller.url_for(:for_session => "1", :remember_me => remember_me?),
@@ -125,7 +127,8 @@ module AuthlogicOpenid
         def create_open_id_auto_register_record(openid_identifier, registration)
           returning klass.new do |auto_reg_record|
             auto_reg_record.openid_identifier = openid_identifier
-            auto_reg_record.send(:map_openid_registration, registration)
+            raise registration.oauth.inspect
+            auto_reg_record.send(:map_openid_registration, registration.ax)
           end
         end
         

@@ -35,6 +35,25 @@ module AuthlogicOpenid
         rw_config(:openid_optional_fields, value, [])
       end
       alias_method :openid_optional_fields=, :openid_optional_fields
+ 
+      # This is the consumer token provided by google after registering your domain 
+      #
+      # * <tt>Default:</tt> ''
+      # * <tt>Accepts:</tt> A string containing the consumer key
+      def oauth_consumer_key(value = nil)
+        rw_config(:oauth_consumer_key, value, [])
+      end
+      alias_method :oauth_consumer_key=, :oauth_consumer_key
+
+      # A string of the seperate oauth permissions to request. 
+      # 
+      # * <tt>Default:</tt> ''
+      # * <tt>Accepts:</tt> A string containing the requested permissions
+      def oauth_scope(value = nil)
+        rw_config(:oauth_scope, value, [])
+      end
+      alias_method :oauth_scope=, :oauth_scope
+
     end
     
     module Methods
@@ -88,6 +107,8 @@ module AuthlogicOpenid
           end
 
           options = {
+           'oauth[scope]' => self.class.oauth_scope, 
+           'oauth[consumer]' => self.class.oauth_consumer_key, 
            :required => self.class.openid_required_fields,
            :optional => self.class.openid_optional_fields,
            :return_to => session_class.controller.url_for(:for_model => "1"),
@@ -98,7 +119,7 @@ module AuthlogicOpenid
               @openid_error = result.message
             else
               self.openid_identifier = openid_identifier
-              map_openid_registration(registration)
+              map_openid_registration(registration.ax)
             end
             
             return true
