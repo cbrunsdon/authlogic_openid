@@ -68,6 +68,7 @@ module AuthlogicOpenid
           validates_confirmation_of_password_field_options validates_confirmation_of_password_field_options.merge(:if => :validate_password_with_openid?)
           validates_length_of_password_confirmation_field_options validates_length_of_password_confirmation_field_options.merge(:if => :validate_password_with_openid?)
         end
+
       end
       
       # Set the openid_identifier field and also resets the persistence_token if this value changes.
@@ -119,6 +120,7 @@ module AuthlogicOpenid
               @openid_error = result.message
             else
               self.openid_identifier = openid_identifier
+              self.oauth_request_token = registration.oauth.request_token if registration.oauth.request_token && self.responds_to?(:oauth_request_token)
               map_openid_registration(registration.ax)
             end
             
