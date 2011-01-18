@@ -120,7 +120,7 @@ module AuthlogicOpenid
               @openid_error = result.message
             else
               self.openid_identifier = openid_identifier
-              self.oauth_request_token = registration.oauth.request_token if registration.oauth.request_token && self.responds_to?(:oauth_request_token)
+              self.oauth_request_token = registration.oauth.request_token if registration.oauth.request_token && self.respond_to?(:oauth_request_token)
               map_openid_registration(registration.ax)
             end
             

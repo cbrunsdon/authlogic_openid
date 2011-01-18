@@ -127,7 +127,7 @@ module AuthlogicOpenid
         def create_open_id_auto_register_record(openid_identifier, registration)
           returning klass.new do |auto_reg_record|
             auto_reg_record.openid_identifier = openid_identifier
-            auto_reg_record.oauth_request_token = registration.oauth.request_token if registration.oauth.request_token && auto_reg_record.responds_to?(:oauth_request_token)
+            auto_reg_record.oauth_request_token = registration.oauth.request_token if registration.oauth.request_token && auto_reg_record.respond_to?(:oauth_request_token)
             auto_reg_record.send(:map_openid_registration, registration.ax)
           end
         end
