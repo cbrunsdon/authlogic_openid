@@ -12,22 +12,23 @@ module AuthlogicOpenid
     module Config
       # What method should we call to find a record by the openid_identifier?
       # This is useful if you want to store multiple openid_identifiers for a single record.
+      # This is also useful if you want to search on something other than an openid identifier
       # You could do something like:
       #
       #   class User < ActiveRecord::Base
-      #     def self.find_by_openid_identifier(identifier)
+      #     def self.find_by_openid_registar(identifier)
       #       user.first(:conditions => {:openid_identifiers => {:identifier => identifier}})
       #     end
       #   end
       #
       # Obviously the above depends on what you are calling your assocition, etc. But you get the point.
       #
-      # * <tt>Default:</tt> :find_by_openid_identifier
+      # * <tt>Default:</tt> :find_by_openid_registration_method, and must be implemented in the acts_as_authentic class
       # * <tt>Accepts:</tt> Symbol
-      def find_by_openid_identifier_method(value = nil)
-        rw_config(:find_by_openid_identifier_method, value, :find_by_openid_identifier)
+      def find_by_openid_registration_method(value = nil)
+        rw_config(:find_by_openid_registration_method, value, :find_by_openid_registration)
       end
-      alias_method :find_by_openid_identifier_method=, :find_by_openid_identifier_method
+      alias_method :find_by_openid_registration_method=, :find_by_openid_registration_method
 
       # Add this in your Session object to Auto Register a new user using openid via sreg
       def auto_register(value=true)
@@ -49,7 +50,7 @@ module AuthlogicOpenid
           validate :validate_by_openid, :if => :authenticating_with_openid?
         end
       end
-      
+
       # Hooks into credentials so that you can pass an :openid_identifier key.
       def credentials=(value)
         super
@@ -78,12 +79,8 @@ module AuthlogicOpenid
           attempted_record.nil? && errors.empty? && (!openid_identifier.blank? || (controller.using_open_id? && controller.params[:for_session]))
         end
         
-        def find_by_openid_identifier_method
-          self.class.find_by_openid_identifier_method
-        end
-
-        def find_by_openid_identifier_method
-          self.class.find_by_openid_identifier_method
+        def find_by_openid_registration_method
+          self.class.find_by_openid_registration_method
         end
 
         def auto_register?
@@ -107,7 +104,7 @@ module AuthlogicOpenid
               return
             end
             
-            self.attempted_record = klass.send(find_by_openid_identifier_method, openid_identifier)
+            self.attempted_record = klass.send(find_by_openid_registration_method, registration)
             
             if !attempted_record
               if auto_register?
@@ -128,7 +125,7 @@ module AuthlogicOpenid
           returning klass.new do |auto_reg_record|
             auto_reg_record.openid_identifier = openid_identifier
             auto_reg_record.oauth_request_token = registration.oauth.request_token if registration.oauth.request_token && auto_reg_record.respond_to?(:oauth_request_token)
-            auto_reg_record.send(:map_openid_registration, registration.ax)
+            auto_reg_record.send(:map_openid_registration, registration)
           end
         end
         

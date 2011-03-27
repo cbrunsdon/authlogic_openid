@@ -121,7 +121,7 @@ module AuthlogicOpenid
             else
               self.openid_identifier = openid_identifier
               self.oauth_request_token = registration.oauth.request_token if registration.oauth.request_token && self.respond_to?(:oauth_request_token)
-              map_openid_registration(registration.ax)
+              map_openid_registration(registration)
             end
             
             return true
@@ -136,9 +136,8 @@ module AuthlogicOpenid
         # Basically you will get a hash of values passed as a single argument. Then just map them as you see fit. Check out
         # the source of this method for an example.
         def map_openid_registration(registration) # :doc:
-          self.name ||= registration[:fullname] if respond_to?(:name) && !registration[:fullname].blank?
-          self.first_name ||= registration[:fullname].split(" ").first if respond_to?(:first_name) && !registration[:fullname].blank?
-          self.last_name ||= registration[:fullname].split(" ").last if respond_to?(:last_name) && !registration[:last_name].blank?
+          self.first_name ||= registration.first_name if respond_to?(:first_name) 
+          self.last_name ||= registration.last_name if respond_to?(:last_name) 
         end
         
         # This method works in conjunction with map_saved_attributes.
