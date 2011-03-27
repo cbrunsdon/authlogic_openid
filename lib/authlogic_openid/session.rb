@@ -16,7 +16,7 @@ module AuthlogicOpenid
       # You could do something like:
       #
       #   class User < ActiveRecord::Base
-      #     def self.find_by_openid_registar(identifier)
+      #     def self.find_by_openid_registration(identifier)
       #       user.first(:conditions => {:openid_identifiers => {:identifier => identifier}})
       #     end
       #   end
